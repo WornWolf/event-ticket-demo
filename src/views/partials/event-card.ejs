@@ -23,28 +23,23 @@
       <p class="medium text-primary-color mb-2">
         <i class="bi bi-calendar-event"></i>
         <% if (ev.startDate && ev.endDate) { 
-            const now = new Date();
-            const endDate = new Date(ev.endDate);
-            if (endDate < now) { %>
+            const now = dayjs().tz('Asia/Bangkok');
+            const endDate = dayjs(ev.endDate).tz('Asia/Bangkok');
+            if (endDate.isBefore(now)) { %>
               <span class="text-danger fw-semibold"> Event has ended </span>
             <% } else if (ev.lockStart) { %>
-              Now – <%= new Date(ev.endDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %> 
-              at <%= new Date(ev.endDate).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }) %>
+              Now – <%= endDate.format('D MMM YYYY [at] HH:mm') %>
             <% } else { 
-                if (new Date(ev.startDate).toDateString() === new Date(ev.endDate).toDateString()) { %>
-                  <%= new Date(ev.startDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %> 
-                  at <%= new Date(ev.startDate).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }) %> – 
-                  <%= new Date(ev.endDate).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }) %>
+                const startDate = dayjs(ev.startDate).tz('Asia/Bangkok');
+                if (startDate.isSame(endDate, 'day')) { %>
+                  <%= startDate.format('D MMM YYYY [at] HH:mm') %> – <%= endDate.format('HH:mm') %>
                 <% } else { %>
-                  <%= new Date(ev.startDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %> 
-                  at <%= new Date(ev.startDate).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }) %> – 
-                  <%= new Date(ev.endDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %> 
-                  at <%= new Date(ev.endDate).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }) %>
+                  <%= startDate.format('D MMM YYYY [at] HH:mm') %> – <%= endDate.format('D MMM YYYY [at] HH:mm') %>
                 <% } 
             } 
-        } else if (ev.date) { %>
-          <%= new Date(ev.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %> 
-          at <%= new Date(ev.date).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }) %>
+        } else if (ev.date) { 
+            const d = dayjs(ev.date).tz('Asia/Bangkok'); %>
+          <%= d.format('D MMM YYYY [at] HH:mm') %>
         <% } else { %>
           — 
         <% } %>

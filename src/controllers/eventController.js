@@ -64,7 +64,7 @@ exports.listOrganizerEvents = async (req, res) => {
 
     const sortedEvents = [...upcoming, ...past];
 
-    res.render("organizer/events/index", { events: sortedEvents });
+    res.render("organizer/events/index", { events: sortedEvents, dayjs });
   } catch (err) {
     console.error(err);
     req.flash("error", "Cannot load events");
