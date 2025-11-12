@@ -27,21 +27,6 @@
   </div>
 </div>
 
-<style>
-.countdown-box {
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 500;
-  transition: background 0.4s ease, color 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.countdown-info { background-color: rgb(73, 146, 255); }
-.countdown-warning { background-color: #ffc107; color: #212529; }
-.countdown-danger { background-color: #dc3545; }
-.countdown-success { background-color: #13b469; }
-.countdown-secondary { background-color: #6c757d; }
-</style>
-
 <!-- Contents -->
 <div class="row g-4">
   <div class="col-lg-7">
@@ -118,7 +103,7 @@
 
           <% } else if (currentUser.role !== 'organizer') { %>
             <!-- ผู้ใช้ปกติสามารถจองได้ -->
-            <form id="bookForm">
+            <form id="bookForm" data-event-id="<%= event._id %>">
               <label class="form-label">จำนวนตั๋วที่ต้องการ</label>
               <div class="input-group mb-3">
                 <input id="qtyInput" class="form-control" type="number" min="1" value="1" max="<%= event.tickets %>"
@@ -144,9 +129,6 @@
             <i class="bi bi-box-arrow-in-right"></i> เข้าสู่ระบบเพื่อจอง
           </a>
         <% } %>
-
-
-
       </div>
     </div>
   </div>
@@ -188,77 +170,6 @@
   </div>
 </div>
 
-<style>
-  #bookingSummaryModal .modal-content { border-radius: 1rem; }
-  #bookingSummaryModal .modal-body p { font-size: 1rem; }
-  #bookingSummaryModal .modal-footer .btn-lg { min-width: 140px; }
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const bookBtn = document.getElementById("bookBtn");
-  const qtyInput = document.getElementById("qtyInput");
-  const modalQty = document.getElementById("modalQty");
-  const modalTotal = document.getElementById("modalTotal");
-  const proceedPaymentBtn = document.getElementById("proceedPaymentBtn");
-  const bookForm = document.getElementById("bookForm");
-
-  const modal = new bootstrap.Modal(document.getElementById('bookingSummaryModal'));
-  const endDate = qtyInput ? new Date(qtyInput.dataset.end) : null;
-  const maxTickets = qtyInput ? parseInt(qtyInput.dataset.max) : 0;
-  const now = new Date();
-
-  // ✅ ป้องกันการเพิ่มเกิน max ด้วยลูกศร หรือ copy/paste
-  if (qtyInput) {
-    qtyInput.addEventListener("input", () => {
-      const max = parseInt(qtyInput.dataset.max) || 0;
-      const val = parseInt(qtyInput.value) || 1;
-
-      if (val > max) {
-        qtyInput.value = max;
-        // แจ้งเตือนเล็กน้อยแบบไม่ intrusive
-        qtyInput.classList.add("is-invalid");
-        setTimeout(() => qtyInput.classList.remove("is-invalid"), 1200);
-      } else if (val < 1) {
-        qtyInput.value = 1;
-      }
-    });
-  }
-
-  if ((endDate && now > endDate) || maxTickets <= 0) {
-    if (bookBtn) bookBtn.disabled = true;
-    if (qtyInput) qtyInput.disabled = true;
-  }
-
-  if (bookBtn) {
-    bookBtn.addEventListener("click", () => {
-      if (bookBtn.disabled) return;
-
-      const qty = parseInt(qtyInput.value) || 1;
-      const price = parseFloat(qtyInput.dataset.price) || 0;
-      const total = qty * price;
-
-      modalQty.textContent = qty;
-      modalTotal.textContent = total.toLocaleString();
-
-      modal.show();
-    });
-  }
-
-  if (proceedPaymentBtn) {
-    proceedPaymentBtn.addEventListener("click", () => {
-      const hiddenInput = document.createElement("input");
-      hiddenInput.type = "hidden";
-      hiddenInput.name = "qty";
-      hiddenInput.value = qtyInput.value;
-      bookForm.appendChild(hiddenInput);
-
-      bookForm.method = "post";
-      bookForm.action = "/events/<%= event._id %>/book";
-      bookForm.submit();
-    });
-  }
-});
-</script>
-
+<link rel="stylesheet" href="/css/events-show.css">
 <script src="/js/event-countdown.js"></script>
+<script src="/js/event-show.js"></script>

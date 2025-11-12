@@ -45,6 +45,8 @@
           id="salesChart"
           height="120"
           aria-label="Sales trend"
+          data-labels="<%- JSON.stringify(chartLabels || []) %>"
+          data-values="<%- JSON.stringify(chartValues || []) %>"
           role="img"
         ></canvas>
       </div>
@@ -104,50 +106,4 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const labels = JSON.parse(`<%- JSON.stringify(chartLabels || []) %>`);
-    const values = JSON.parse(`<%- JSON.stringify(chartValues || []) %>`);
-    const canvas = document.getElementById("salesChart");
-    if (!canvas) return;
-
-    if (!labels.length) {
-      canvas.replaceWith(
-        Object.assign(document.createElement("div"), {
-          className: "text-muted small text-center py-4",
-          innerText: "ยังไม่มีข้อมูลกราฟ",
-        })
-      );
-      return;
-    }
-
-    new Chart(canvas, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label: "ยอดขาย (บาท/วัน)",
-          data: values,
-          tension: 0.3,
-          fill: true,
-          backgroundColor: "rgba(54, 162, 235, 0.2)",
-          borderColor: "rgba(54, 162, 235, 1)",
-          borderWidth: 2,
-          pointRadius: 2
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        interaction: { mode: "index", intersect: false },
-        scales: {
-          x: { ticks: { maxTicksLimit: 6 } },
-          y: {
-            beginAtZero: true,
-            ticks: { callback: v => "฿" + Number(v).toLocaleString() }
-          }
-        }
-      }
-    });
-  });
-</script>
-
+<script src="/js/dashboard.js" defer></script>

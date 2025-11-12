@@ -35,74 +35,154 @@
       <div class="row g-3">
         <!-- ชื่อ -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">ชื่ออีเวนต์<span class="text-danger">*</span></label>
-          <input name="title" class="form-control form-control-lg" value="<%= event.title %>" required />
+          <label class="form-label fw-semibold"
+            >ชื่ออีเวนต์<span class="text-danger">*</span></label
+          >
+          <input
+            name="title"
+            class="form-control form-control-lg"
+            value="<%= event.title %>"
+            required
+          />
         </div>
 
         <!-- วันเริ่มต้น -->
         <div class="col-md-3">
-          <label class="form-label fw-semibold">วันเริ่มต้น<span class="text-danger">*</span></label>
-          <input id="startDate" name="startDate" type="datetime-local" class="form-control form-control-lg"
-            value="<%= startLocal.slice(0,16) %>" required />
+          <label class="form-label fw-semibold"
+            >วันเริ่มต้น<span class="text-danger">*</span></label
+          >
+          <input
+            id="startDate"
+            name="startDate"
+            type="datetime-local"
+            class="form-control form-control-lg"
+            value="<%= startLocal.slice(0,16) %>"
+            required
+          />
           <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="lockStartCheck" name="lockStart" value="true"
-              onchange="toggleLockStart()" <%= event.lockStart ? 'checked' : '' %>>
-            <label class="form-check-label" for="lockStartCheck">ตั้งแต่วันนี้</label>
+            <input class="form-check-input" type="checkbox" id="lockStartCheck"
+            name="lockStart" value="true" onchange="toggleLockStart()" <%=
+            event.lockStart ? 'checked' : '' %>>
+            <label class="form-check-label" for="lockStartCheck"
+              >ตั้งแต่วันนี้</label
+            >
           </div>
         </div>
 
         <!-- วันสิ้นสุด -->
         <div class="col-md-3">
-          <label class="form-label fw-semibold">วันสิ้นสุด<span class="text-danger">*</span></label>
-          <input id="endDate" name="endDate" type="datetime-local" class="form-control form-control-lg"
-            value="<%= endLocal %>" required />
+          <label class="form-label fw-semibold"
+            >วันสิ้นสุด<span class="text-danger">*</span></label
+          >
+          <input
+            id="endDate"
+            name="endDate"
+            type="datetime-local"
+            class="form-control form-control-lg"
+            value="<%= endLocal %>"
+            required
+          />
         </div>
 
         <!-- รายละเอียด -->
         <div class="col-12">
           <label class="form-label fw-semibold">รายละเอียด</label>
-          <textarea name="description" class="form-control form-control-lg" rows="4"><%= event.description %></textarea>
+          <textarea
+            name="description"
+            class="form-control form-control-lg"
+            rows="4"
+          >
+<%= event.description %></textarea
+          >
         </div>
 
         <!-- สถานที่ -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">สถานที่</label>
-          <input name="location" class="form-control form-control-lg" value="<%= event.location %>" />
+          <input
+            name="location"
+            class="form-control form-control-lg"
+            value="<%= event.location %>"
+          />
         </div>
 
         <!-- ราคา -->
         <div class="col-md-3">
           <label class="form-label fw-semibold">ราคา (บาท)</label>
-          <input name="price" type="number" class="form-control form-control-lg" value="<%= event.price %>" min="0" />
+          <input
+            name="price"
+            type="number"
+            class="form-control form-control-lg"
+            value="<%= event.price %>"
+            min="0"
+          />
         </div>
 
         <!-- จำนวนตั๋ว -->
         <div class="col-md-3">
           <label class="form-label fw-semibold">จำนวนตั๋ว</label>
-          <input name="tickets" type="number" class="form-control form-control-lg" value="<%= event.tickets %>" min="1" />
+          <input
+            name="tickets"
+            type="number"
+            class="form-control form-control-lg"
+            value="<%= event.tickets %>"
+            min="1"
+          />
         </div>
 
         <!-- รูปภาพ -->
         <div class="col-12">
           <label class="form-label fw-semibold">รูปภาพ (สูงสุด 5MB)</label>
           <div class="input-group">
-            <input id="image" name="image" type="file" accept="image/*" class="form-control form-control-lg" />
-            <button type="button" class="btn btn-outline-danger" id="btnRemoveImage" title="ลบรูป">&times;</button>
+            <input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+              class="form-control form-control-lg"
+            />
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              id="btnRemoveImage"
+              title="ลบรูป"
+            >
+              &times;
+            </button>
           </div>
           <!-- ✅ ธงแจ้งฝั่งเซิร์ฟเวอร์เมื่อลบรูป -->
-          <input type="hidden" name="removeImage" id="removeImage" value="0">
-          <small class="text-muted">รองรับ JPG, JPEG, PNG, WEBP — ไม่เกิน 5MB</small>
+          <input type="hidden" name="removeImage" id="removeImage" value="0" />
+          <small class="text-muted"
+            >รองรับ JPG, JPEG, PNG, WEBP — ไม่เกิน 5MB</small
+          >
 
-          <div id="preview-container" class="mt-3 <%= event.imageUrl ? '' : 'd-none' %> text-center">
-            <img id="preview" src="<%= event.imageUrl %>" class="img-fluid rounded shadow-sm" style="max-height:250px;" alt="preview" />
+          <div
+            id="preview-container"
+            class="mt-3 <%= event.imageUrl ? '' : 'd-none' %> text-center"
+          >
+            <img
+              id="preview"
+              src="<%= event.imageUrl %>"
+              class="img-fluid rounded shadow-sm"
+              style="max-height: 250px"
+              alt="preview"
+            />
             <% if (event.imageUrl) { %>
-              <br>
-              <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="editExistingImage">แก้ไขรูป</button>
+            <br />
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm mt-2"
+              id="editExistingImage"
+            >
+              แก้ไขรูป
+            </button>
             <% } %>
           </div>
         </div>
 
-        <div class="col-12 d-flex justify-content-between align-items-center mt-3">
+        <div
+          class="col-12 d-flex justify-content-between align-items-center mt-3"
+        >
           <a href="/organizer/events" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> กลับ
           </a>
@@ -118,11 +198,19 @@
 <!-- Upload Modal -->
 <div id="uploadModal" class="d-none">
   <div class="modal-overlay"></div>
-  <div class="modal-content d-flex flex-column justify-content-center align-items-center">
-    <div class="spinner-border text-primary" role="status" style="width:4rem; height:4rem;">
+  <div
+    class="modal-content d-flex flex-column justify-content-center align-items-center"
+  >
+    <div
+      class="spinner-border text-primary"
+      role="status"
+      style="width: 4rem; height: 4rem"
+    >
       <span class="visually-hidden">Loading...</span>
     </div>
-    <div id="uploadMsg" class="mt-3 fs-5 fw-semibold text-center">กำลังบันทึก...</div>
+    <div id="uploadMsg" class="mt-3 fs-5 fw-semibold text-center">
+      กำลังบันทึก...
+    </div>
   </div>
 </div>
 
@@ -130,258 +218,57 @@
 <div id="cropModal" class="d-none">
   <div class="modal-overlay"></div>
   <div class="modal-content">
-    <div class="modal-header d-flex justify-content-between align-items-center mb-2">
+    <div
+      class="modal-header d-flex justify-content-between align-items-center mb-2"
+    >
       <h5 class="m-0">Crop Event Image</h5>
       <button type="button" class="btn-close" id="btnCropCancel"></button>
     </div>
     <div class="modal-body text-center">
-      <img id="cropImage" style="max-width:100%; max-height:400px; display:block; margin:auto;">
+      <img
+        id="cropImage"
+        style="max-width: 100%; max-height: 400px; display: block; margin: auto"
+      />
       <div class="mt-3 d-flex justify-content-center gap-3 flex-wrap">
-        <label>Zoom
-          <input type="range" id="cropZoom" min="0.1" max="3" step="0.01" value="1">
+        <label
+          >Zoom
+          <input
+            type="range"
+            id="cropZoom"
+            min="0.1"
+            max="3"
+            step="0.01"
+            value="1"
+          />
         </label>
-        <label>Rotate
-          <input type="range" id="cropRotate" min="-180" max="180" step="1" value="0">
+        <label
+          >Rotate
+          <input
+            type="range"
+            id="cropRotate"
+            min="-180"
+            max="180"
+            step="1"
+            value="0"
+          />
         </label>
       </div>
     </div>
     <div class="modal-footer justify-content-end gap-2">
-      <button id="btnCropCancelFooter" class="btn btn-secondary btn-sm">Cancel</button>
-      <button id="btnCropConfirm" class="btn btn-primary btn-sm">Crop & Save</button>
+      <button id="btnCropCancelFooter" class="btn btn-secondary btn-sm">
+        Cancel
+      </button>
+      <button id="btnCropConfirm" class="btn btn-primary btn-sm">
+        Crop & Save
+      </button>
     </div>
   </div>
 </div>
 
-<style>
-/* Modal common */
-#uploadModal, #cropModal {
-  position: fixed; top:0; left:0; width:100%; height:100%;
-  display:flex; justify-content:center; align-items:center;
-  z-index:3000; opacity:0; transition: opacity 0.3s ease;
-}
-#uploadModal.d-none, #cropModal.d-none { display:none; opacity:0; }
-#uploadModal.show, #cropModal.show { opacity:1; }
-
-#uploadModal .modal-overlay, #cropModal .modal-overlay {
-  position:absolute; top:0; left:0; width:100%; height:100%; 
-  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-}
-
-#uploadModal .modal-content, #cropModal .modal-content {
-  position: relative; background:#fff; border-radius:1rem; padding:2rem;
-  width: 400px; max-width: 90vw; display:flex; flex-direction:column;
-  justify-content:center; align-items:center; text-align:center;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3); transform: scale(0.9);
-  transition: transform 0.3s ease;
-}
-#uploadModal.show .modal-content, #cropModal.show .modal-content { transform: scale(1); }
-</style>
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/organizer-edit.css" />
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+  rel="stylesheet"
+/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-<script>
-const startInput = document.getElementById("startDate");
-const endInput = document.getElementById("endDate");
-const form = document.getElementById("eventForm");
-const imageInput = document.getElementById("image");
-const modal = document.getElementById("uploadModal");
-const preview = document.getElementById("preview");
-const previewContainer = document.getElementById("preview-container");
-const lockStartCheck = document.getElementById("lockStartCheck");
-
-// --- Date helpers ---
-function toLocalDateTimeInput(date){
-  const d = new Date(date);
-  const tzOffset = d.getTimezoneOffset()*60000;
-  return new Date(d.getTime()-tzOffset).toISOString().slice(0,16);
-}
-function todayLocalISO(){ return toLocalDateTimeInput(new Date()); }
-
-// ---------- Init + min rule เหมือน new.ejs ----------
-document.addEventListener("DOMContentLoaded", ()=>{
-  const t = todayLocalISO();
-  startInput.min = t;
-  endInput.min = t;
-
-  if(lockStartCheck.checked){
-    startInput.value = t;
-    startInput.min = t;
-    startInput.readOnly = true;
-  }else{
-    startInput.readOnly = false;
-  }
-  updateEndMin();
-});
-
-// อัปเดต min ของ end ตามสถานะ lockStart / startInput
-function updateEndMin(){
-  const t = todayLocalISO();
-  if (lockStartCheck.checked) {
-    // ติ๊ก "ตั้งแต่วันนี้": end ต้อง >= วันนี้
-    endInput.min = t;
-    if (endInput.value && endInput.value < t) endInput.value = t;
-  } else {
-    // ไม่ติ๊ก: end ต้อง >= start (ถ้ายังไม่มี start ใช้วันนี้เป็นฐาน)
-    const base = startInput.value || t;
-    endInput.min = base;
-    if (endInput.value && endInput.value < base) endInput.value = base;
-  }
-}
-
-function toggleLockStart(){
-  const t = todayLocalISO();
-  if(lockStartCheck.checked){
-    startInput.value = t;
-    startInput.min = t;
-    startInput.readOnly = true;
-  } else {
-    startInput.readOnly = false;
-    // ให้ผู้ใช้ตั้งค่า start เอง; ถ้าเว้นว่างไว้ end จะกันด้วยวันนี้ใน updateEndMin()
-    // ไม่เซ็ต value ติดตาย
-  }
-  updateEndMin();
-}
-
-// --- Validate dates (อิง endInput.min) ---
-function validateStart(){
-  if(!startInput.value) return true;
-  if(lockStartCheck.checked) return true;
-  const d=new Date(startInput.value), now=new Date();
-  const t1=d.getTime(), t2=new Date(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours(),now.getMinutes()).getTime();
-  if(t1<t2){
-    alert("ไม่สามารถเลือกวันในอดีตได้");
-    startInput.value="";
-    startInput.focus();
-    return false;
-  }
-  return true;
-}
-
-function validateEnd(){
-  if(!endInput.value) return true;
-  const minStr = endInput.min || todayLocalISO();
-  const min = new Date(minStr);
-  const val = new Date(endInput.value);
-  if (val < min) {
-    alert("วันสิ้นสุดต้องไม่ต่ำกว่าขอบเขตที่กำหนด");
-    endInput.value = minStr;
-    endInput.focus();
-    return false;
-  }
-  return true;
-}
-
-function validateDates(){
-  if(!startInput.value || !endInput.value) return true;
-  if(new Date(endInput.value) < new Date(startInput.value)){
-    alert("วันสิ้นสุดต้องไม่ต่ำกว่าวันเริ่มต้น");
-    endInput.value = endInput.min || startInput.value;
-    endInput.focus();
-    return false;
-  }
-  return true;
-}
-
-startInput.addEventListener("change", ()=>{
-  validateStart();
-  updateEndMin();     // สำคัญ: ปรับขอบเขต end ทุกครั้งที่เปลี่ยน start
-  validateDates();
-});
-
-endInput.addEventListener("change", ()=>{
-  validateEnd();
-  validateDates();
-});
-
-// --- Upload modal ---
-function showUploadModal(){ modal.classList.remove("d-none"); setTimeout(()=> modal.classList.add("show"),10); }
-function hideUploadModal(){ modal.classList.remove("show"); setTimeout(()=> modal.classList.add("d-none"),300); }
-form.addEventListener("submit",(e)=>{
-  if(!validateStart()||!validateEnd()||!validateDates()){ e.preventDefault(); return; }
-  showUploadModal();
-});
-
-// --- Image preview & remove (no inline onclick) ---
-function handleRemoveImage(e){
-  e?.preventDefault?.();
-  const removeFlag = document.getElementById("removeImage");
-  if (imageInput) imageInput.value = "";
-  if (preview) preview.src = "";
-  if (previewContainer) previewContainer.classList.add("d-none");
-  if (removeFlag) removeFlag.value = "1"; // แจ้ง server ให้ลบรูป
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const btnRemove = document.getElementById("btnRemoveImage");
-  const removeFlag = document.getElementById("removeImage");
-  if (btnRemove) btnRemove.addEventListener("click", handleRemoveImage);
-  if (imageInput && removeFlag){
-    imageInput.addEventListener("change", (e)=>{
-      if(e.target.files && e.target.files[0]) removeFlag.value = "0"; // มีไฟล์ใหม่ → ไม่ลบ
-    });
-  }
-});
-
-// --- Cropper ---
-let cropper;
-function openCropperWithSrc(src){
-  const cropImg=document.getElementById("cropImage");
-  cropImg.src=src;
-  const cropModal=document.getElementById("cropModal");
-  cropModal.classList.remove("d-none");
-  setTimeout(()=> cropModal.classList.add("show"),10);
-
-  if(cropper) cropper.destroy();
-  cropper=new Cropper(cropImg,{aspectRatio:16/9, viewMode:1, autoCropArea:1});
-
-  const zoomSlider=document.getElementById("cropZoom");
-  const rotateSlider=document.getElementById("cropRotate");
-  zoomSlider.value=1; rotateSlider.value=0;
-  zoomSlider.oninput=()=>{ cropper.zoomTo(parseFloat(zoomSlider.value)); };
-  rotateSlider.oninput=()=>{ cropper.rotateTo(parseFloat(rotateSlider.value)); };
-}
-
-imageInput.addEventListener("change", (e)=>{
-  const file = e.target.files?.[0];
-  if(!file) return;
-  if(file.size>5*1024*1024){ alert("⚠️ ไฟล์ใหญ่เกิน 5MB"); handleRemoveImage(); return; }
-  openCropperWithSrc(URL.createObjectURL(file));
-});
-
-// ปุ่มแก้ไขรูปเดิม
-const editExistingBtn = document.getElementById("editExistingImage");
-if(editExistingBtn){ editExistingBtn.addEventListener("click", ()=>{
-  if(preview && preview.src){ openCropperWithSrc(preview.src); }
-}); }
-
-// Cancel crop
-document.getElementById("btnCropCancel").addEventListener("click", closeCrop);
-document.getElementById("btnCropCancelFooter").addEventListener("click", closeCrop);
-function closeCrop(){ 
-  const cropModal=document.getElementById("cropModal"); 
-  cropModal.classList.remove("show"); 
-  setTimeout(()=> cropModal.classList.add("d-none"),300);
-  if(cropper) cropper.destroy(); cropper=null; 
-}
-
-// Confirm crop
-document.getElementById("btnCropConfirm").addEventListener("click", ()=>{
-  const removeFlag = document.getElementById("removeImage");
-  if(!cropper) return;
-  cropper.getCroppedCanvas({maxWidth:1200, maxHeight:675}).toBlob((blob)=>{
-    const file=new File([blob],"event.jpg",{type:"image/jpeg"});
-    const dt=new DataTransfer();
-    dt.items.add(file);
-    imageInput.files=dt.files;
-
-    preview.src=URL.createObjectURL(blob);
-    previewContainer.classList.remove("d-none");
-
-    // จะอัปโหลดรูปใหม่แทนของเดิม
-    if (removeFlag) removeFlag.value = "0";
-
-    closeCrop();
-  },"image/jpeg",0.9);
-});
-</script>
+<script src="/js/organizer-edit.js" defer></script>
