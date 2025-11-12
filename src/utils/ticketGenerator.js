@@ -4,8 +4,7 @@ const QRCode = require("qrcode");
 const crypto = require("crypto");
 
 // รับ BASE_URL จาก .env หรือ fallback เป็น localhost
-const BASE_URL =
-  process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+const BASE_URL = process.env.BASE_URL ;
 
 async function generateTickets(booking) {
   const tickets = [];
