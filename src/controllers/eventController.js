@@ -89,14 +89,15 @@ exports.createEvent = async (req, res) => {
 
     // จัดการวันเวลา
     if (isLockStart) {
-      payload.startDate = new Date();
-      if (endDate) payload.endDate = new Date(endDate);
+      payload.startDate = new Date().toISOString();
+      if (endDate) payload.endDate = new Date(endDate).toISOString();
     } else if (startDate && endDate) {
-      payload.startDate = new Date(startDate);
-      payload.endDate = new Date(endDate);
+      payload.startDate = new Date(startDate).toISOString();
+      payload.endDate = new Date(endDate).toISOString();
     } else if (date) {
-      payload.date = new Date(date);
+      payload.date = new Date(date).toISOString();
     }
+
 
     // อัปโหลดรูปภาพ
     if (req.file) {
