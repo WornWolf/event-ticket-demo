@@ -6,19 +6,12 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const engine = require("ejs-mate");
-const fetch = require("node-fetch");
-const bcrypt = require("bcrypt");
 
 // Database
 const { connectDB } = require("./src/config/db");
 
 // Models
-const { User } = require("./src/models/User");
-const { PendingUser } = require("./src/models/PendingUser");
 const { Event } = require("./src/models/Event");
-
-// Middleware
-const { isAuthenticated } = require("./src/middleware/auth");
 
 // Routes
 const authRoutes = require("./src/routes/auth");
@@ -27,9 +20,6 @@ const bookingRoutes = require("./src/routes/bookings");
 const organizerRoutes = require("./src/routes/organizer");
 const accountRoutes = require("./src/routes/account");
 const ticketRoutes = require("./src/routes/tickets");
-
-// Utils
-const { sendOTP } = require("./src/utils/mailer");
 
 // Connect Database
 connectDB();
