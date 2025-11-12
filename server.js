@@ -38,10 +38,10 @@ app.set("trust proxy", 1);
 /* -------------------------------------------------------------------------- */
 /*                             ✅ CORS Config                                   */
 /* -------------------------------------------------------------------------- */
-const FRONTEND_URL = process.env.BASE_URL || `http://localhost:${PORT}`; // เปลี่ยนเป็น frontend ของคุณ
+
 app.use(cors({
-  origin: FRONTEND_URL, // อนุญาตเฉพาะ frontend domain นี้
-  credentials: true,    // สำคัญ! ให้ cookie/session ถูกส่งข้ามโดเมน
+  origin: process.env.BASE_URL,
+  credentials: true,    
 }));
 
 app.engine("ejs", engine);
