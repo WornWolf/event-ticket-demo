@@ -18,6 +18,7 @@ export function initCheckIn(currentUserId) {
       const res = await fetch("/organizer/checkin/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ keyword }),
       });
       const data = await res.json();
@@ -131,6 +132,7 @@ export function initCheckIn(currentUserId) {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ ticketId }),
       });
       const data = await res.json();

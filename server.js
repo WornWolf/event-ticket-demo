@@ -7,6 +7,7 @@ const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const engine = require("ejs-mate");
 const MongoStore = require("connect-mongo");
+const cors = require("cors"); // ✅ เพิ่ม cors
 
 // Database
 const { connectDB } = require("./src/config/db");
@@ -32,9 +33,16 @@ const PORT = process.env.PORT || 3000;
 /* -------------------------------------------------------------------------- */
 /*                          ✅ Trust Proxy (สำคัญมาก)                         */
 /* -------------------------------------------------------------------------- */
-// บอก Express ให้รู้ว่าอยู่หลัง Proxy (เช่น Vercel, Render, Railway)
-// เพื่อให้ secure cookies ทำงานได้
 app.set("trust proxy", 1);
+
+/* -------------------------------------------------------------------------- */
+/*                             ✅ CORS Config                                   */
+/* -------------------------------------------------------------------------- */
+const FRONTEND_URL = process.env.BASE_URL || `http://localhost:${PORT}`; // เปลี่ยนเป็น frontend ของคุณ
+app.use(cors({
+  origin: FRONTEND_URL, // อนุญาตเฉพาะ frontend domain นี้
+  credentials: true,    // สำคัญ! ให้ cookie/session ถูกส่งข้ามโดเมน
+}));
 
 app.engine("ejs", engine);
 app.set("view engine", "ejs");
@@ -57,14 +65,14 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI, // ใช้ key เดียวกับ .env ของคุณ
-      ttl: 24 * 60 * 60, // อายุ session = 1 วัน
+      mongoUrl: process.env.MONGODB_URI,
+      ttl: 24 * 60 * 60,
     }),
     cookie: {
-      secure: process.env.NODE_ENV === "production", // true เมื่อรันบน Vercel (HTTPS)
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      httpOnly: true, // ป้องกันการเข้าถึง cookie จาก client-side JS
-      maxAge: 24 * 60 * 60 * 1000, // อายุ cookie = 1 วัน
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -106,7 +114,7 @@ app.get("/", async (req, res) => {
 app.use((req, res) => res.status(404).render("404"));
 
 /* -------------------------------------------------------------------------- */
-/*                              START SERVER                                 */
+/*                              START SERVER                                  */
 /* -------------------------------------------------------------------------- */
 app.listen(PORT, () =>
   console.log(`✅ Server running on http://localhost:${PORT}`)

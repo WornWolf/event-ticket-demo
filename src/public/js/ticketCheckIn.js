@@ -9,6 +9,7 @@ const form = document.getElementById("checkinForm");
             const res = await fetch("/ticket/checkin", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: 'include',
             body: JSON.stringify({ ticketId, t }),
             });
             const data = await res.json();
