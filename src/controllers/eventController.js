@@ -1,5 +1,11 @@
 const { Event } = require("../models/Event");
 const { cloudinary } = require("../config/cloudinary");
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /* -------------------------------------------------------------------------- */
 /*                         HELPER: UPLOAD TO CLOUDINARY                       */
@@ -87,17 +93,16 @@ exports.createEvent = async (req, res) => {
       lockStart: isLockStart,
     };
 
-    // จัดการวันเวลา
+    // จัดการวันเวลา ด้วย dayjs + Asia/Bangkok
     if (isLockStart) {
-      payload.startDate = new Date().toISOString();
-      if (endDate) payload.endDate = new Date(endDate).toISOString();
+      payload.startDate = dayjs().tz('Asia/Bangkok').toDate();
+      if (endDate) payload.endDate = dayjs(endDate).tz('Asia/Bangkok').toDate();
     } else if (startDate && endDate) {
-      payload.startDate = new Date(startDate).toISOString();
-      payload.endDate = new Date(endDate).toISOString();
+      payload.startDate = dayjs(startDate).tz('Asia/Bangkok').toDate();
+      payload.endDate = dayjs(endDate).tz('Asia/Bangkok').toDate();
     } else if (date) {
-      payload.date = new Date(date).toISOString();
+      payload.date = dayjs(date).tz('Asia/Bangkok').toDate();
     }
-
 
     // อัปโหลดรูปภาพ
     if (req.file) {
@@ -161,17 +166,17 @@ exports.updateEvent = async (req, res) => {
       lockStart: isLockStart,
     };
 
-    // วันที่
+    // จัดการวันเวลา ด้วย dayjs + Asia/Bangkok
     if (isLockStart) {
-      payload.startDate = new Date();
-      if (endDate) payload.endDate = new Date(endDate);
+      payload.startDate = dayjs().tz('Asia/Bangkok').toDate();
+      if (endDate) payload.endDate = dayjs(endDate).tz('Asia/Bangkok').toDate();
       payload.date = undefined;
     } else if (startDate && endDate) {
-      payload.startDate = new Date(startDate);
-      payload.endDate = new Date(endDate);
+      payload.startDate = dayjs(startDate).tz('Asia/Bangkok').toDate();
+      payload.endDate = dayjs(endDate).tz('Asia/Bangkok').toDate();
       payload.date = undefined;
     } else if (date) {
-      payload.date = new Date(date);
+      payload.date = dayjs(date).tz('Asia/Bangkok').toDate();
       payload.startDate = undefined;
       payload.endDate = undefined;
     }
