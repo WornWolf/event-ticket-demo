@@ -29,6 +29,13 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+/* -------------------------------------------------------------------------- */
+/*                          ✅ Trust Proxy (สำคัญมาก)                         */
+/* -------------------------------------------------------------------------- */
+// บอก Express ให้รู้ว่าอยู่หลัง Proxy (เช่น Vercel, Render, Railway)
+// เพื่อให้ secure cookies ทำงานได้
+app.set("trust proxy", 1);
+
 app.engine("ejs", engine);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "src/views"));
@@ -41,22 +48,27 @@ app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "src/public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+/* -------------------------------------------------------------------------- */
+/*                         ✅ Session Config (อัปเดต)                         */
+/* -------------------------------------------------------------------------- */
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "devsecret",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,  // คุณมี MONGO_URI อยู่แล้ว
+      mongoUrl: process.env.MONGODB_URI, // ใช้ key เดียวกับ .env ของคุณ
       ttl: 24 * 60 * 60, // อายุ session = 1 วัน
     }),
     cookie: {
-      secure: process.env.NODE_ENV === "production", // true เมื่อรันบน Vercel
+      secure: process.env.NODE_ENV === "production", // true เมื่อรันบน Vercel (HTTPS)
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      httpOnly: true, // ป้องกันการเข้าถึง cookie จาก client-side JS
       maxAge: 24 * 60 * 60 * 1000, // อายุ cookie = 1 วัน
     },
   })
 );
+
 app.use(flash());
 
 // Expose user & flash messages to views
@@ -68,9 +80,8 @@ app.use((req, res, next) => {
   next();
 });
 
-
 /* -------------------------------------------------------------------------- */
-/*                                  ROUTES                                     */
+/*                                  ROUTES                                    */
 /* -------------------------------------------------------------------------- */
 app.use("/", authRoutes);
 app.use("/", eventRoutes);
@@ -80,7 +91,7 @@ app.use("/", accountRoutes);
 app.use("/", ticketRoutes);
 
 /* -------------------------------------------------------------------------- */
-/*                               HOME PAGE                                     */
+/*                                HOME PAGE                                   */
 /* -------------------------------------------------------------------------- */
 app.get("/", async (req, res) => {
   const q = req.query.q || "";
@@ -90,11 +101,13 @@ app.get("/", async (req, res) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                                  404                                         */
+/*                                  404 Page                                  */
 /* -------------------------------------------------------------------------- */
 app.use((req, res) => res.status(404).render("404"));
 
 /* -------------------------------------------------------------------------- */
-/*                                START SERVER                                  */
+/*                              START SERVER                                 */
 /* -------------------------------------------------------------------------- */
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`✅ Server running on http://localhost:${PORT}`)
+);
