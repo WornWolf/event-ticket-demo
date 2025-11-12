@@ -6,6 +6,7 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const engine = require("ejs-mate");
+const MongoStore = require("connect-mongo");
 
 // Database
 const { connectDB } = require("./src/config/db");
@@ -45,6 +46,15 @@ app.use(
     secret: process.env.SESSION_SECRET || "devsecret",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,  // คุณมี MONGO_URI อยู่แล้ว
+      ttl: 24 * 60 * 60, // อายุ session = 1 วัน
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // true เมื่อรันบน Vercel
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // อายุ cookie = 1 วัน
+    },
   })
 );
 app.use(flash());
