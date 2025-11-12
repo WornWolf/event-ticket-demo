@@ -36,7 +36,7 @@ exports.showEventDetail = async (req, res) => {
 
     if (!event) return res.status(404).render("404");
 
-    res.render("events/show", { event });
+    res.render("events/show", { event, dayjs });
   } catch (err) {
     console.error(err);
     res.status(500).render("500");
@@ -64,7 +64,7 @@ exports.listOrganizerEvents = async (req, res) => {
 
     const sortedEvents = [...upcoming, ...past];
 
-    res.render("organizer/events/index", { events: sortedEvents, dayjs });
+    res.render("organizer/events/index", { events: sortedEvents });
   } catch (err) {
     console.error(err);
     req.flash("error", "Cannot load events");
