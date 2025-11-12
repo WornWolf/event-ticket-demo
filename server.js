@@ -7,7 +7,6 @@ const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const engine = require("ejs-mate");
 const MongoStore = require("connect-mongo");
-const cors = require("cors"); // ✅ เพิ่ม cors
 
 // Database
 const { connectDB } = require("./src/config/db");
@@ -35,15 +34,6 @@ const PORT = process.env.PORT || 3000;
 /* -------------------------------------------------------------------------- */
 app.set("trust proxy", 1);
 
-/* -------------------------------------------------------------------------- */
-/*                             ✅ CORS Config                                   */
-/* -------------------------------------------------------------------------- */
-
-app.use(cors({
-  origin: process.env.BASE_URL,
-  credentials: true,    
-}));
-
 app.engine("ejs", engine);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "src/views"));
@@ -59,23 +49,18 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 /* -------------------------------------------------------------------------- */
 /*                         ✅ Session Config (อัปเดต)                         */
 /* -------------------------------------------------------------------------- */
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "devsecret",
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
-      ttl: 24 * 60 * 60,
-    }),
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-    },
-  })
-);
+app.use(session({
+  secret: process.env.SESSION_SECRET || "devsecret",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", 
+    sameSite: 'lax',
+  },
+}));
 
 app.use(flash());
 
