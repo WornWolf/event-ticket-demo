@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { Ticket } = require("../models/Ticket");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
