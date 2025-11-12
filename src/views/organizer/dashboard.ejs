@@ -1,0 +1,153 @@
+<% layout('layout') -%>
+
+<h2 class="h4 mb-3">Dashboard</h2>
+
+<div class="row g-3">
+  <!-- ยอดขายรวม -->
+  <div class="col-md-4">
+    <div class="card shadow-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-2">ยอดขายรวม</h5>
+          <i class="bi bi-currency-exchange fs-4 opacity-75"></i>
+        </div>
+        <h3 class="mb-0">
+          ฿<%= Number(summary.totalRevenue || 0).toLocaleString() %>
+        </h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- จำนวนออเดอร์ -->
+  <div class="col-md-4">
+    <div class="card shadow-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-2">จำนวนออเดอร์</h5>
+          <i class="bi bi-receipt fs-4 opacity-75"></i>
+        </div>
+        <h3 class="mb-0">
+          <%= Number(summary.orders || 0).toLocaleString() %>
+        </h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- แนวโน้มยอดขาย -->
+  <div class="col-md-4">
+    <div class="card shadow-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-2">แนวโน้มยอดขาย</h5>
+          <i class="bi bi-graph-up-arrow fs-4 opacity-75"></i>
+        </div>
+        <canvas
+          id="salesChart"
+          height="120"
+          aria-label="Sales trend"
+          role="img"
+        ></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4 class="mt-4 mb-2">การสั่งซื้อล่าสุด</h4>
+<div class="card shadow-soft">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>อีเวนต์</th>
+          <th>ผู้ซื้อ</th>
+          <th>จำนวน</th>
+          <th>รวม</th>
+          <th>เมื่อ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recent && recent.length) { %> <% recent.forEach(b => { %>
+        <tr>
+          <td>
+            <a href="/events/<%= b.event?._id %>" class="text-decoration-none">
+              <%= b.event?.title || '(อีเวนต์ถูกลบแล้ว)' %>
+            </a>
+          </td>
+          <td>
+            <%= b.user?.name || 'ไม่ทราบผู้ซื้อ' %>
+            <br />
+            <small class="text-muted"><%= b.user?.email %></small>
+          </td>
+          <td><%= b.qty %></td>
+          <td class="fw-semibold">
+            ฿<%= Number(b.total||0).toLocaleString() %>
+          </td>
+          <td class="text-muted">
+            <% const d = new Date(b.createdAt); const dateStr =
+            d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit',
+            year: 'numeric' }); const timeStr = d.toLocaleTimeString('en-GB', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            }); %> <%= dateStr %> <%= timeStr %>
+          </td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">
+            ยังไม่มีคำสั่งซื้อล่าสุด
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const labels = JSON.parse(`<%- JSON.stringify(chartLabels || []) %>`);
+    const values = JSON.parse(`<%- JSON.stringify(chartValues || []) %>`);
+    const canvas = document.getElementById("salesChart");
+    if (!canvas) return;
+
+    if (!labels.length) {
+      canvas.replaceWith(
+        Object.assign(document.createElement("div"), {
+          className: "text-muted small text-center py-4",
+          innerText: "ยังไม่มีข้อมูลกราฟ",
+        })
+      );
+      return;
+    }
+
+    new Chart(canvas, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "ยอดขาย (บาท/วัน)",
+          data: values,
+          tension: 0.3,
+          fill: true,
+          backgroundColor: "rgba(54, 162, 235, 0.2)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 2,
+          pointRadius: 2
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          x: { ticks: { maxTicksLimit: 6 } },
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => "฿" + Number(v).toLocaleString() }
+          }
+        }
+      }
+    });
+  });
+</script>
+

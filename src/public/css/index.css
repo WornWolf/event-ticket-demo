@@ -1,0 +1,35 @@
+.card-link {
+    color: var(--text) !important;
+  }
+
+.card-link:hover {
+    color: var(--primary);
+}
+.bg-highlight {
+    background: var(--bg-light) !important;
+}
+
+#search-events {
+    color: var(--text) !important;
+}
+
+#search-btn {
+    background-color: #00a884 !important;
+}
+
+#search-box {
+    background-color: rgb(160, 232, 190) !important;
+}
+
+:root[data-theme="dark"] #search-events {
+    color: #000 !important;
+}
+:root[data-theme="dark"] .bg-light .text-muted {
+    color: #000 !important;
+}
+:root[data-theme="dark"] .card .card-body p.text-muted {
+    color: #000 !important;
+}
+:root[data-theme="dark"] .card .card-body p.small.text-muted {
+    color: #000 !important;
+}

@@ -1,0 +1,315 @@
+<% layout('layout') -%>
+
+<!-- Breadcrumb -->
+<div aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb rounded-3 p-2 mb-0">
+    <li class="breadcrumb-item">
+      <a href="/" class="text-decoration-none">
+        <i class="bi bi-house-door-fill me-1"></i> Home
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">อีเวนต์ของฉัน</li>
+  </ol>
+</div>
+
+<div
+  class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"
+>
+  <h2 class="h4 mb-0">อีเวนต์ของฉัน</h2>
+
+  <!-- 🔍 Search bar -->
+  <div class="flex-grow-1 mx-2" style="max-width: 300px">
+    <input
+      id="searchInput"
+      type="text"
+      class="form-control"
+      placeholder="ค้นหาอีเวนต์..."
+    />
+  </div>
+
+  <!-- 🔽 Sort dropdown -->
+  <div style="max-width: 250px">
+    <select id="sortSelect" class="form-select">
+      <option value="createdAsc">สร้าง: เก่า → ใหม่</option>
+      <option value="createdDesc" selected>สร้าง: ใหม่ → เก่า</option>
+      <option value="priceAsc">ราคา: น้อย → มาก</option>
+      <option value="priceDesc">ราคา: มาก → น้อย</option>
+      <option value="ticketsAsc">คงเหลือ: น้อย → มาก</option>
+      <option value="ticketsDesc">คงเหลือ: มาก → น้อย</option>
+      <option value="startAsc">วันเริ่มต้น: เก่า → ใหม่</option>
+      <option value="startDesc">วันเริ่มต้น: ใหม่ → เก่า</option>
+    </select>
+  </div>
+
+  <a class="btn btn-primary" href="/organizer/events/new">
+    <i class="bi bi-plus-circle"></i> สร้างใหม่
+  </a>
+</div>
+
+<div class="card shadow-soft">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0" id="eventsTable">
+      <thead class="table-light">
+        <tr>
+          <th>ชื่อ</th>
+          <th>วันเวลา</th>
+          <th>ราคา</th>
+          <th>คงเหลือ</th>
+          <th class="text-end">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (events && events.length) { %> <% events.forEach(ev => { const
+        soldOut = (ev.tickets || 0) <= 0; const price = Number(ev.price||0);
+        const tickets = soldOut ? 0 : ev.tickets; %>
+        <tr
+          data-title="<%= ev.title.toLowerCase() %>"
+          data-start="<%= new Date(ev.startDate).getTime() %>"
+          data-end="<%= new Date(ev.endDate).getTime() %>"
+          data-price="<%= Number(ev.price||0) %>"
+          data-tickets="<%= (ev.tickets || 0) %>"
+          data-lockstart="<%= ev.lockStart ? 'true' : 'false' %>"
+          data-created="<%= new Date(ev.createdAt).getTime() %>"
+        >
+          <td>
+            <a
+              href="/events/<%= ev._id %>"
+              class="text-decoration-none fw-medium event-title"
+            >
+              <%= ev.title %>
+            </a>
+          </td>
+
+          <td class="text-muted">
+            <% function formatDateOnly(date) { return new
+            Date(date).toLocaleDateString('en-GB', { day: '2-digit', month:
+            'short', year: 'numeric' }); } function formatTimeOnly(date) {
+            return new Date(date).toLocaleTimeString('en-GB', { hour: '2-digit',
+            minute: '2-digit', hour12: false }); } %> <% if (ev.startDate &&
+            ev.endDate) { const start = new Date(ev.startDate); const end = new
+            Date(ev.endDate); const startDateStr = formatDateOnly(start); const
+            endDateStr = formatDateOnly(end); const startTimeStr =
+            formatTimeOnly(start); const endTimeStr = formatTimeOnly(end); if
+            (ev.lockStart) { %> Now – <%= endDateStr %>, <%= endTimeStr %> <% }
+            else if (startDateStr === endDateStr) { %> <%= startDateStr %>, <%=
+            startTimeStr %> - <%= endTimeStr %> <% } else { %> <%= startDateStr
+            %>, <%= startTimeStr %> - <%= endDateStr %>, <%= endTimeStr %> <% }
+            %> <% } else if (ev.date) { %> <%= formatDateOnly(ev.date) %>, <%=
+            formatTimeOnly(ev.date) %> <% } else { %> — <% } %>
+          </td>
+
+          <td class="fw-semibold">฿<%= price.toLocaleString() %></td>
+          <td>
+            <span
+              class="badge <%= soldOut ? 'text-bg-danger' : 'text-bg-success' %>"
+            >
+              <%= soldOut ? 'Sold out' : tickets %>
+            </span>
+          </td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-secondary"
+              href="/organizer/events/<%= ev._id %>/edit"
+            >
+              <i class="bi bi-pencil"></i> แก้ไข
+            </a>
+            <form
+              class="d-inline delete-form"
+              method="post"
+              action="/organizer/events/<%= ev._id %>?_method=DELETE"
+            >
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i> ลบ
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">
+            ยังไม่มีอีเวนต์ — เริ่มสร้างอีเวนต์แรกของคุณได้เลย
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 🗑 Modal ยืนยันการลบ -->
+<div
+  class="modal fade"
+  id="confirmDeleteModal"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-triangle text-danger me-2"></i>ยืนยันการลบ
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 fs-5">
+          คุณต้องการลบอีเวนต์ "<span id="deleteEventName"></span>" ใช่ไหม?
+        </p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button
+          type="button"
+          class="btn btn-secondary px-4"
+          data-bs-dismiss="modal"
+        >
+          ยกเลิก
+        </button>
+        <button id="confirmDeleteBtn" type="button" class="btn btn-danger px-4">
+          <i class="bi bi-trash"></i> ลบ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⏳ Modal กำลังลบ -->
+<div
+  class="modal fade"
+  id="loadingModal"
+  tabindex="-1"
+  aria-hidden="true"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div
+      class="modal-content border-0 p-4 d-flex flex-column align-items-center justify-content-center"
+      style="min-width: 200px; min-height: 150px"
+    >
+      <div
+        class="spinner-border text-danger mb-3"
+        role="status"
+        style="width: 3rem; height: 3rem"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mb-0 fs-5 text-center">กำลังลบอีเวนต์...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const sortSelect = document.getElementById("sortSelect");
+    const tbody = document.querySelector("#eventsTable tbody");
+    const allRows = Array.from(tbody.querySelectorAll("tr"));
+    const nowTimestamp = Date.now();
+
+    // Filter + Sort
+    function renderTable() {
+      const query = searchInput.value.trim().toLowerCase();
+      const sortValue = sortSelect.value;
+
+      let filteredRows = allRows.filter((row) =>
+        row.dataset.title.includes(query)
+      );
+
+      filteredRows.sort((a, b) => {
+        const priceA = parseFloat(a.dataset.price) || 0;
+        const priceB = parseFloat(b.dataset.price) || 0;
+        const ticketsA = parseInt(a.dataset.tickets) || 0;
+        const ticketsB = parseInt(b.dataset.tickets) || 0;
+        const startA = parseInt(a.dataset.start) || 0;
+        const startB = parseInt(b.dataset.start) || 0;
+        const endA = parseInt(a.dataset.end) || 0;
+        const endB = parseInt(b.dataset.end) || 0;
+        const lockA = a.dataset.lockstart === "true";
+        const lockB = b.dataset.lockstart === "true";
+
+        switch (sortValue) {
+          case "priceAsc":
+            return priceA - priceB;
+          case "priceDesc":
+            return priceB - priceA;
+          case "ticketsAsc":
+            return ticketsA - ticketsB;
+          case "ticketsDesc":
+            return ticketsB - ticketsA;
+          case "startAsc": {
+            if (lockA && !lockB) return -1;
+            if (!lockA && lockB) return 1;
+            if (lockA && lockB) return endA - endB;
+            if (startA !== startB) return startA - startB;
+            return endA - endB;
+          }
+          case "startDesc": {
+            const realStartA = lockA ? nowTimestamp : startA;
+            const realStartB = lockB ? nowTimestamp : startB;
+            if (realStartB !== realStartA) return realStartB - realStartA;
+            return endB - endA;
+          }
+          case "createdAsc":
+            return (
+              (parseInt(a.dataset.created) || 0) -
+              (parseInt(b.dataset.created) || 0)
+            );
+          case "createdDesc":
+            return (
+              (parseInt(b.dataset.created) || 0) -
+              (parseInt(a.dataset.created) || 0)
+            );
+          default:
+            return 0;
+        }
+      });
+
+      tbody.innerHTML = "";
+      filteredRows.forEach((row) => tbody.appendChild(row));
+    }
+
+    searchInput.addEventListener("input", renderTable);
+    sortSelect.addEventListener("change", renderTable);
+    renderTable();
+
+    // 🗑 ระบบลบ modal
+    const confirmModal = new bootstrap.Modal(
+      document.getElementById("confirmDeleteModal")
+    );
+    const loadingModal = new bootstrap.Modal(
+      document.getElementById("loadingModal")
+    );
+    const deleteEventName = document.getElementById("deleteEventName");
+    let formToDelete = null;
+
+    document.querySelectorAll(".delete-form").forEach((form) => {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        formToDelete = form;
+
+        const row = form.closest("tr");
+        const eventName = row.querySelector(".event-title").textContent;
+
+        // ใส่ตัวหนา
+        deleteEventName.innerHTML = `<strong>${eventName}</strong>`;
+
+        confirmModal.show();
+      });
+    });
+
+    document
+      .getElementById("confirmDeleteBtn")
+      .addEventListener("click", () => {
+        confirmModal.hide();
+        loadingModal.show();
+
+        setTimeout(() => {
+          if (formToDelete) formToDelete.submit();
+        }, 1000);
+      });
+  });
+</script>

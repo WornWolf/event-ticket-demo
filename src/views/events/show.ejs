@@ -1,0 +1,264 @@
+<% layout('layout') -%>
+
+<!-- Breadcrumb -->
+<div aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb rounded-3 p-2 mb-0">
+    <li class="breadcrumb-item">
+      <a href="/" class="text-decoration-none">
+        <i class="bi bi-house-door-fill me-1"></i> Home
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      <%= event.title %>
+    </li>
+  </ol>
+</div>
+
+<!-- Countdown Box -->
+<div id="countdown-box"
+     class="countdown-box my-3 d-flex align-items-center gap-2 d-none text-white"
+     role="status"
+     data-start="<%= event.startDate || event.date ? new Date(event.startDate || event.date).toISOString() : '' %>"
+     data-end="<%= event.endDate ? new Date(event.endDate).toISOString() : '' %>">
+  <i class="bi bi-hourglass-split fs-5"></i>
+  <div>
+    <div class="small mb-1" id="countdown-label">งานจะเริ่มใน</div>
+    <h6 id="countdown" class="fw-bold mb-0">—</h6>
+  </div>
+</div>
+
+<style>
+.countdown-box {
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 500;
+  transition: background 0.4s ease, color 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.countdown-info { background-color: rgb(73, 146, 255); }
+.countdown-warning { background-color: #ffc107; color: #212529; }
+.countdown-danger { background-color: #dc3545; }
+.countdown-success { background-color: #13b469; }
+.countdown-secondary { background-color: #6c757d; }
+</style>
+
+<!-- Contents -->
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-soft">
+      <% if (event.imageUrl) { %>
+        <div class="ratio ratio-16x9 rounded-top overflow-hidden">
+          <img src="<%= event.imageUrl %>" class="w-100 h-100 object-fit-cover" alt="<%= event.title %>">
+        </div>
+      <% } %>
+
+      <div class="card-body">
+        <h2 class="mb-2 d-flex justify-content-between align-items-center">
+          <%= event.title %>
+          <% if (
+            currentUser &&
+            currentUser.role === 'organizer' && 
+            event.organizer && 
+            event.organizer._id.toString() === currentUser._id.toString()
+          ) { %>
+            <a class="btn btn-sm btn-outline-secondary"
+               href="/organizer/events/<%= event._id %>/edit">
+               <i class="bi bi-pencil"></i> แก้ไข
+            </a>
+          <% } %>
+        </h2>
+
+        <div class="medium text-muted mb-3">
+          <p>
+            <i class="bi bi-calendar-event"></i>
+            <% if (event.startDate && event.endDate) { %>
+              <%= new Date(event.startDate).toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false }) %>
+              – 
+              <%= new Date(event.endDate).toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false }) %>
+            <% } else if (event.date) { %>
+              <%= new Date(event.date).toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false }) %>
+            <% } else { %>
+              — 
+            <% } %>
+            <br>
+            <i class="bi bi-geo-alt"></i> <%= event.location || '—' %>
+          </p>
+        </div>
+
+        <hr>
+        <p class="small"><%- event.description || '<i>No details...</i>' %></p>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-soft position-sticky" style="top: 90px;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">฿<%= Number(event.price || 0).toLocaleString() %></h4>
+          <span class="badge fs-6 p-2 fw-normal <%= event.tickets <= 0 ? 'text-bg-danger' : 'text-bg-success' %>">
+            <%= event.tickets <= 0 ? 'Sold out' : ('เหลือตั๋ว: ' + event.tickets) %>
+          </span>
+        </div>
+        <hr>
+
+        <% if (currentUser) { %>
+          <% 
+            const userId = currentUser._id.toString();
+            const organizerId = (typeof event.organizer === 'object') ? event.organizer._id.toString() : event.organizer.toString();
+            const isOwner = userId === organizerId;
+          %>
+
+          <% if (isOwner) { %>
+            <!-- เจ้าของงานไม่สามารถจอง -->
+            <div class="card text-center bg-info text-white p-3">
+              <i class="bi bi-person-gear"></i> เจ้าของงานไม่สามารถจองตั๋วได้
+            </div>
+
+          <% } else if (currentUser.role !== 'organizer') { %>
+            <!-- ผู้ใช้ปกติสามารถจองได้ -->
+            <form id="bookForm">
+              <label class="form-label">จำนวนตั๋วที่ต้องการ</label>
+              <div class="input-group mb-3">
+                <input id="qtyInput" class="form-control" type="number" min="1" value="1" max="<%= event.tickets %>"
+                      data-max="<%= event.tickets %>" data-price="<%= Number(event.price || 0) %>"
+                      data-end="<%= event.endDate ? new Date(event.endDate).toISOString() : '' %>">
+
+                <button type="button" class="btn btn-primary" id="bookBtn" 
+                        <%= event.tickets <= 0 ? 'disabled' : '' %>>
+                  <i class="bi bi-bag-check"></i> จอง / ซื้อ
+                </button>
+              </div>
+            </form>
+
+          <% } else { %>
+            <!-- Organizer ทั่วไป -->
+            <div class="card text-center bg-warning text-dark p-3">
+              <i class="bi bi-person-gear"></i> บัญชีผู้จัดงานไม่สามารถจองตั๋วได้
+            </div>
+          <% } %>
+
+        <% } else { %>
+          <a class="btn btn-outline-primary w-100" href="/login">
+            <i class="bi bi-box-arrow-in-right"></i> เข้าสู่ระบบเพื่อจอง
+          </a>
+        <% } %>
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Summary Modal -->
+<div class="modal fade" id="bookingSummaryModal" tabindex="-1" aria-labelledby="bookingSummaryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      
+      <div class="modal-header text-white " style="background: linear-gradient(135deg, #4e9af1, #1c6cd6); border-bottom: none;">
+        <h5 class="modal-title d-flex align-items-center gap-2" id="bookingSummaryLabel">
+          <i class="bi bi-card-checklist fs-4"></i> สรุปการจอง
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="card shadow-sm border-0 p-3 mb-3">
+          <p class="mb-2"><strong>อีเวนต์:</strong> <%= event.title %></p>
+          <p class="mb-2"><strong>จำนวนตั๋ว:</strong> <span id="modalQty">1</span></p>
+          <p class="mb-2"><strong>ราคาต่อใบ:</strong> ฿<%= Number(event.price || 0).toLocaleString() %></p>
+          <hr>
+          <p class="mb-0 fw-bold fs-5 text-center">
+            รวมทั้งหมด: ฿ <span id="modalTotal" class="text-success"><%= Number(event.price || 0).toLocaleString() %></span> 
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer f-end">
+        <!-- <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-1"></i> ยกเลิก
+        </button> -->
+        <button type="button" class="btn btn-primary btn-lg" id="proceedPaymentBtn">
+          <i class="bi bi-credit-card-2-front me-1"></i> ชำระเงินต่อ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #bookingSummaryModal .modal-content { border-radius: 1rem; }
+  #bookingSummaryModal .modal-body p { font-size: 1rem; }
+  #bookingSummaryModal .modal-footer .btn-lg { min-width: 140px; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const bookBtn = document.getElementById("bookBtn");
+  const qtyInput = document.getElementById("qtyInput");
+  const modalQty = document.getElementById("modalQty");
+  const modalTotal = document.getElementById("modalTotal");
+  const proceedPaymentBtn = document.getElementById("proceedPaymentBtn");
+  const bookForm = document.getElementById("bookForm");
+
+  const modal = new bootstrap.Modal(document.getElementById('bookingSummaryModal'));
+  const endDate = qtyInput ? new Date(qtyInput.dataset.end) : null;
+  const maxTickets = qtyInput ? parseInt(qtyInput.dataset.max) : 0;
+  const now = new Date();
+
+  // ✅ ป้องกันการเพิ่มเกิน max ด้วยลูกศร หรือ copy/paste
+  if (qtyInput) {
+    qtyInput.addEventListener("input", () => {
+      const max = parseInt(qtyInput.dataset.max) || 0;
+      const val = parseInt(qtyInput.value) || 1;
+
+      if (val > max) {
+        qtyInput.value = max;
+        // แจ้งเตือนเล็กน้อยแบบไม่ intrusive
+        qtyInput.classList.add("is-invalid");
+        setTimeout(() => qtyInput.classList.remove("is-invalid"), 1200);
+      } else if (val < 1) {
+        qtyInput.value = 1;
+      }
+    });
+  }
+
+  if ((endDate && now > endDate) || maxTickets <= 0) {
+    if (bookBtn) bookBtn.disabled = true;
+    if (qtyInput) qtyInput.disabled = true;
+  }
+
+  if (bookBtn) {
+    bookBtn.addEventListener("click", () => {
+      if (bookBtn.disabled) return;
+
+      const qty = parseInt(qtyInput.value) || 1;
+      const price = parseFloat(qtyInput.dataset.price) || 0;
+      const total = qty * price;
+
+      modalQty.textContent = qty;
+      modalTotal.textContent = total.toLocaleString();
+
+      modal.show();
+    });
+  }
+
+  if (proceedPaymentBtn) {
+    proceedPaymentBtn.addEventListener("click", () => {
+      const hiddenInput = document.createElement("input");
+      hiddenInput.type = "hidden";
+      hiddenInput.name = "qty";
+      hiddenInput.value = qtyInput.value;
+      bookForm.appendChild(hiddenInput);
+
+      bookForm.method = "post";
+      bookForm.action = "/events/<%= event._id %>/book";
+      bookForm.submit();
+    });
+  }
+});
+</script>
+
+<script src="/js/event-countdown.js"></script>

@@ -1,0 +1,62 @@
+<% layout('layout') -%>
+
+<h2 class="h4 mb-3">E-Ticket ของอีเวนต์: <%= booking.event.title %></h2>
+
+<div class="card shadow-soft mb-3 p-3">
+  <p>จำนวนที่ซื้อ: <strong><%= booking.qty %></strong></p>
+  <p>รวม: <strong>฿<%= Number(booking.total).toLocaleString() %></strong></p>
+  <p>
+    สถานะ:
+    <span
+      class="badge <%= booking.status === 'paid' ? 'bg-success' : 'bg-warning text-dark' %>"
+    >
+      <%= booking.status %>
+    </span>
+  </p>
+</div>
+
+<div class="row g-3">
+  <% if (tickets && tickets.length) { %> <% tickets.forEach(t => { %>
+  <div class="col-md-4">
+    <div class="card shadow-soft text-center p-3">
+      <div class="mb-2">
+        <strong>Code:</strong> <%= t.ticketCode %>
+        <p class="small">
+          <strong>Status:</strong>
+          <span
+            class="badge <%= t.status === 'valid' ? 'bg-success' : t.status === 'used' ? 'bg-danger' : 'bg-secondary' %>"
+          >
+            <%= t.status.toUpperCase() %>
+          </span>
+          </p>
+      </div>
+
+      <div class="mb-3">
+        <img
+          src="<%= t.qrCodeDataUrl %>"
+          alt="QR Ticket"
+          style="width: 150px; height: 150px; object-fit: contain"
+        />
+      </div>
+      <a
+        href="/ticket/verify?b=<%= t.booking %>&t=<%= t.qrToken %>"
+        target="_blank"
+        class="btn btn-sm btn-outline-primary w-100"
+      >
+        ตรวจสอบบัตร
+      </a>
+      <a
+        href="<%= t.qrCodeDataUrl %>"
+        download="ticket-<%= t.ticketCode %>.png"
+        class="btn btn-sm btn-outline-secondary w-100 mt-1"
+      >
+        ดาวน์โหลด QR
+      </a>
+    </div>
+  </div>
+  <% }) %> <% } else { %>
+  <div class="col-12 text-center text-muted py-4">
+    <i class="bi bi-ticket-detailed"></i> ยังไม่มีบัตร
+  </div>
+  <% } %>
+</div>

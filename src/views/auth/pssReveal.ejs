@@ -1,0 +1,15 @@
+<script>
+  function togglePassword() {
+    const pwInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    if (pwInput.type === 'password') {
+      pwInput.type = 'text';
+      eyeIcon.classList.remove('bi-eye');
+      eyeIcon.classList.add('bi-eye-slash');
+    } else {
+      pwInput.type = 'password';
+      eyeIcon.classList.remove('bi-eye-slash');
+      eyeIcon.classList.add('bi-eye');
+    }
+  }
+</script>

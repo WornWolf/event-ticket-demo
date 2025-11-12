@@ -1,0 +1,61 @@
+<% layout('layout') -%>
+
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="min-height: 80vh"
+>
+  <div
+    class="card shadow-lg border-0 rounded-4"
+    style="max-width: 450px; width: 100%"
+  >
+    <div class="card-body text-center p-5">
+      <h3 class="mb-3 fw-bold text-success">
+        <i class="bi bi-shield-lock-fill"></i> ยืนยันรหัส OTP
+      </h3>
+
+      <p class="text-muted mb-4">
+        กรุณากรอกรหัสที่ส่งไปยังอีเมล <br />
+        <strong><%= email %></strong>
+      </p>
+
+      <form id="otpForm" method="POST" action="/verify-otp">
+        <input type="hidden" name="email" value="<%= email %>" />
+        <input type="hidden" id="timeLeftInput" value="<%= timeLeft %>" />
+
+        <div class="mb-4">
+          <input
+            type="text"
+            name="otp"
+            id="otpInput"
+            maxlength="6"
+            pattern="\d{6}"
+            class="form-control form-control-lg text-center fs-4"
+            placeholder="รหัส OTP 6 หลัก"
+            required
+            autofocus
+          />
+        </div>
+
+        <button class="btn btn-success btn-lg w-100 shadow-sm" type="submit">
+          ยืนยัน
+        </button>
+      </form>
+
+      <div class="mt-4">
+        <p class="text-muted small mb-2">
+          รหัสจะหมดอายุใน
+          <span id="countdown" class="fw-bold text-danger fs-5">01:00</span>
+        </p>
+
+        <form id="resendForm" method="POST" action="/resend-otp">
+          <input type="hidden" name="email" value="<%= email %>" />
+          <button id="resendBtn" class="btn btn-warning btn-sm mt-3" disabled>
+            <i class="bi bi-arrow-repeat"></i> ส่งรหัสใหม่
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/verifyOTP.js"></script>

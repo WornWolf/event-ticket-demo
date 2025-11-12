@@ -1,0 +1,120 @@
+<% layout('layout') -%>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <% if (ok && ticket) { %>
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <!-- สถานะบัตร -->
+          <div class="my-3">
+            <h3 class="fw-bold">
+              <i
+                class="bi <%= ticket.status === 'valid' ? 'bi-check-circle-fill text-success' : ticket.status === 'used' ? 'bi-check-circle text-primary' : 'bi-x-circle-fill text-danger' %> me-2"
+              ></i>
+              <%= ticket.status === 'valid' ? 'บัตรถูกต้อง' : ticket.status ===
+              'used' ? 'บัตรถูกใช้งานแล้ว' : 'บัตรถูกยกเลิก' %>
+            </h3>
+            <hr />
+          </div>
+
+          <!-- รายละเอียดบัตร -->
+          <div class="mb-3 text-start">
+            <p><strong>อีเวนต์:</strong> <%= ticket.event?.title || '-' %></p>
+            <p>
+              <strong>ผู้ถือบัตร:</strong> <%= ticket.owner?.name ||
+              ticket.owner?.email %>
+            </p>
+            <p>
+              <strong>สถานะบัตร:</strong>
+              <span
+                class="badge <%= ticket.status === 'valid' ? 'bg-success' : ticket.status === 'used' ? 'bg-danger' : 'bg-secondary' %>"
+              >
+                <%= ticket.status.toUpperCase() %>
+              </span>
+            </p>
+            <% if(ticket.checkedInAt){ %>
+            <p>
+              <strong>เช็กอินเมื่อ:</strong>
+              <%= new Date(ticket.checkedInAt).toLocaleString('en-GB', { day:
+              '2-digit', month: 'short', year: 'numeric', hour: '2-digit',
+              minute: '2-digit', second: '2-digit', hour12: false }) %> <% } %>
+            </p>
+          </div>
+
+          <!-- QR Code + Ticket ID -->
+          <% if(ticket.qrCodeDataUrl){ %>
+          <div class="my-3">
+            <p class="fs-5 mb-0">
+              <strong>Code:</strong> <%= ticket.ticketCode %>
+            </p>
+            <img
+              src="<%= ticket.qrCodeDataUrl %>"
+              alt="QR Code"
+              class="img-fluid rounded shadow-sm my-3"
+              style="max-width: 250px"
+            />
+            <p><strong>ID:</strong> <%= ticket._id %></p>
+          </div>
+          <a
+            href="<%= ticket.qrCodeDataUrl %>"
+            download="ticket-<%= ticket._id %>.png"
+            class="btn btn-outline-primary w-50 mb-3"
+          >
+            <i class="bi bi-download me-1"></i> ดาวน์โหลด QR Code
+          </a>
+          <% } %>
+
+          <!-- ปุ่มเช็กอิน (สำหรับเจ้าหน้าที่) -->
+          <% if(currentUser && currentUser.role === 'organizer' &&
+          ticket.event.organizer._id.toString() === currentUser._id.toString()
+          && ticket.status === 'valid'){ %>
+          <form id="checkinForm">
+            <input type="hidden" name="ticketId" value="<%= ticket._id %>" />
+            <input type="hidden" name="t" value="<%= ticket.qrToken %>" />
+            <button type="submit" class="btn btn-success w-50 mb-3">
+              <i class="bi bi-check2-circle me-1"></i> เช็กอินบัตร
+            </button>
+          </form>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Script เช็กอิน -->
+      <script>
+        const form = document.getElementById("checkinForm");
+        if (form) {
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const ticketId = form.querySelector("[name=ticketId]").value;
+            const t = form.querySelector("[name=t]").value;
+
+            try {
+              const res = await fetch("/ticket/checkin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ticketId, t }),
+              });
+              const data = await res.json();
+              alert(data.message);
+              if (data.ok) location.reload();
+            } catch (err) {
+              console.error(err);
+              alert("เกิดข้อผิดพลาดในการเช็กอิน");
+            }
+          });
+        }
+      </script>
+
+      <% } else { %>
+      <div class="alert alert-danger text-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <%= reason || 'ไม่สามารถตรวจสอบบัตรได้' %>
+      </div>
+      <div class="text-center mt-3">
+        <a href="/" class="btn btn-secondary">กลับไปหน้าแรก</a>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>

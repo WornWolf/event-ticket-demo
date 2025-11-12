@@ -1,0 +1,74 @@
+<% layout('layout') -%>
+
+<h2 class="h4 mb-3">ประวัติการซื้อตั๋วของฉัน</h2>
+
+<div class="card shadow-soft">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>อีเวนต์</th>
+          <th>จำนวน</th>
+          <th>รวม</th>
+          <th style="min-width: 160px">E-Ticket</th>
+          <th>สถานะ</th>
+          <th>เมื่อ</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% if (bookings && bookings.length) { %> <% bookings.forEach(b => { %>
+        <tr>
+          <td>
+            <% if (b.event) { %>
+            <a href="/events/<%= b.event._id %>" class="text-decoration-none">
+              <%= b.event.title %>
+            </a>
+            <% } else { %>
+            <span class="text-muted">(อีเวนต์ถูกลบแล้ว)</span>
+            <% } %>
+          </td>
+
+          <td><%= b.qty %></td>
+
+          <td class="fw-semibold">
+            ฿<%= Number(b.total || 0).toLocaleString() %>
+          </td>
+
+          <!-- แก้ตรง E-Ticket ให้เป็นปุ่มดูรายละเอียด -->
+          <td>
+            <% if (b.status === 'paid') { %>
+            <a
+              href="/me/bookings/<%= b._id %>"
+              class="btn btn-sm btn-outline-primary w-50"
+            >
+              ดู E-Ticket
+            </a>
+            <% } else { %>
+            <span class="text-muted small">ยังไม่ชำระ</span>
+            <% } %>
+          </td>
+
+          <td>
+            <span
+              class="badge <%= b.status === 'paid' ? 'bg-success' : b.status === 'pending' ? 'bg-warning text-dark' : 'bg-danger' %>"
+            >
+              <%= b.status %>
+            </span>
+          </td>
+
+          <td class="text-muted">
+            <%= new Date(b.createdAt).toLocaleString() %>
+          </td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">
+            <i class="bi bi-ticket-detailed"></i> ยังไม่มีประวัติการซื้อตั๋ว
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
