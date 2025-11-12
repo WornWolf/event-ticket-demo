@@ -24,30 +24,13 @@ function isPasswordStrong(password) {
 
 /* ----------------------------- REGISTER ----------------------------- */
 exports.getRegister = (req, res) => {
-  res.render('auth/register', {
-    recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
-  });
+  res.render('auth/register');
 };
 
 exports.postRegister = async (req, res) => {
-  const { name, email, password, "g-recaptcha-response": captcha } = req.body;
-  
-  if (!captcha) {
-    req.flash("error", "กรุณายืนยัน CAPTCHA");
-    return res.redirect("/register");
-  }
-
-  const verifyURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captcha}`;
+  const { name, email, password } = req.body;
 
   try {
-    const response = await fetch(verifyURL, { method: "POST" });
-    const data = await response.json();
-
-    if (!data.success) {
-      req.flash("error", "CAPTCHA ไม่ผ่านการยืนยัน");
-      return res.redirect("/register");
-    }
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       req.flash("error", "Email นี้ถูกใช้ไปแล้ว");
@@ -77,6 +60,7 @@ exports.postRegister = async (req, res) => {
     res.redirect("/register");
   }
 };
+
 
 // ---------------------- REGISTER WITH OTP ----------------------
 exports.getVerifyOtp = async (req, res) => {
