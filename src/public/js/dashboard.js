@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
     const canvas = document.getElementById("salesChart");
+    if (!canvas) return;
+    
     const labels = JSON.parse(canvas.dataset.labels || "[]");
     const values = JSON.parse(canvas.dataset.values || "[]");
-    if (!canvas) return;
 
     if (!labels.length) {
       canvas.replaceWith(
