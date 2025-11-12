@@ -15,7 +15,7 @@ export function initCheckIn(currentUserId) {
     resultArea.innerHTML = `<div class="alert alert-info">กำลังค้นหา...</div>`;
 
     try {
-      const res = await fetch("/organizer/checkin/search", {
+      const res = await fetch(`${process.env.BASE_URL}/organizer/checkin/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
