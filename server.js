@@ -7,6 +7,12 @@ const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const engine = require("ejs-mate");
 const MongoStore = require("connect-mongo");
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Database
 const { connectDB } = require("./src/config/db");
@@ -90,7 +96,7 @@ app.get("/", async (req, res) => {
   const q = req.query.q || "";
   const filter = q ? { title: new RegExp(q, "i") } : {};
   const events = await Event.find(filter).sort({ date: 1 }).lean();
-  res.render("index", { events, q });
+  res.render("index", { events, q , dayjs});
 });
 
 /* -------------------------------------------------------------------------- */
