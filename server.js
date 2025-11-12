@@ -47,7 +47,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI,  // คุณมี MONGO_URI อยู่แล้ว
+      mongoUrl: process.env.MONGODB_URI,  // คุณมี MONGO_URI อยู่แล้ว
       ttl: 24 * 60 * 60, // อายุ session = 1 วัน
     }),
     cookie: {
